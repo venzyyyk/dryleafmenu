@@ -18,7 +18,7 @@ interface Props {
   onSelect: (table: ReserveTable) => void;
 }
 
-type Spot = { x: number; y: number; w: number; h: number };
+type Spot = { x: number; y: number; w: number; h: number; chairs?: "lr" | "tb" };
 
 const GOLD = "#C9A86A";
 const SAGE = "#8DA888";
@@ -89,6 +89,16 @@ const CITADEL_SPOTS: Record<string, Spot> = {
   "BILLIARD_LARGE-3": { x: 372, y: 348, w: 130, h: 68 },
   "BILLIARD_LARGE-5": { x: 66, y: 458, w: 66, h: 120 },
   "BILLIARD_LARGE-4": { x: 428, y: 458, w: 66, h: 120 },
+
+  // Пристенные столики на 2 места (стулья сверху и снизу)
+  "DINING-1": { x: 22, y: 118, w: 30, h: 30, chairs: "tb" },
+  "DINING-2": { x: 22, y: 248, w: 30, h: 30, chairs: "tb" },
+  "DINING-3": { x: 22, y: 378, w: 30, h: 30, chairs: "tb" },
+  "DINING-4": { x: 22, y: 508, w: 30, h: 30, chairs: "tb" },
+  "DINING-5": { x: 508, y: 118, w: 30, h: 30, chairs: "tb" },
+  "DINING-6": { x: 508, y: 248, w: 30, h: 30, chairs: "tb" },
+  "DINING-7": { x: 508, y: 378, w: 30, h: 30, chairs: "tb" },
+  "DINING-8": { x: 508, y: 508, w: 30, h: 30, chairs: "tb" },
 };
 
 function CitadelFixtures() {
@@ -111,14 +121,6 @@ function CitadelFixtures() {
       </g>
       {[228, 262, 296, 330].map((cx) => (
         <circle key={cx} cx={cx} cy={464} r="6" fill="none" stroke={DECOR} strokeWidth="1.5" />
-      ))}
-
-      {/* Диванчики вдоль стен (декор) */}
-      {[100, 180, 300, 380, 500].map((y) => (
-        <rect key={`l${y}`} x="20" y={y} width="13" height="30" rx="5" fill="none" stroke={DECOR} strokeWidth="1.3" />
-      ))}
-      {[100, 180, 300, 380, 500].map((y) => (
-        <rect key={`r${y}`} x="527" y={y} width="13" height="30" rx="5" fill="none" stroke={DECOR} strokeWidth="1.3" />
       ))}
     </>
   );
@@ -260,6 +262,8 @@ function TableShape({
           {/* Стулья вокруг */}
           {(table.seats >= 4
             ? [[cx, y - 7], [cx, y + h + 7], [x - 7, cy], [x + w + 7, cy]]
+            : spot.chairs === "tb"
+            ? [[cx, y - 8], [cx, y + h + 8]]
             : [[x - 7, cy], [x + w + 7, cy]]
           ).map(([px, py], i) => (
             <circle key={i} cx={px} cy={py} r="5.5" fill="#1C1F15" stroke={DECOR} strokeWidth="1.3" />

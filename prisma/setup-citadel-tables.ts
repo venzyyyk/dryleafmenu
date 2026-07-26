@@ -11,6 +11,7 @@ async function main() {
   const venue = await prisma.venue.findUnique({ where: { slug: "citadel" } });
   if (!venue) throw new Error("Заведение citadel не найдено в базе");
 
+  // 8 больших бильярдных
   for (let n = 1; n <= 8; n++) {
     await prisma.table.upsert({
       where: {
@@ -26,6 +27,27 @@ async function main() {
         kind: TableKind.BILLIARD_LARGE,
         number: n,
         seats: 4,
+        code: code(),
+      },
+    });
+  }
+
+  // 8 пристенных столиков на 2 места
+  for (let n = 1; n <= 8; n++) {
+    await prisma.table.upsert({
+      where: {
+        venueId_kind_number: {
+          venueId: venue.id,
+          kind: TableKind.DINING,
+          number: n,
+        },
+      },
+      update: { seats: 2 },
+      create: {
+        venueId: venue.id,
+        kind: TableKind.DINING,
+        number: n,
+        seats: 2,
         code: code(),
       },
     });

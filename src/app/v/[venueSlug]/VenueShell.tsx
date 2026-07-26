@@ -40,10 +40,11 @@ export default function VenueShell({
           {/* Кнопка бронирования */}
           <Link
             href={`/v/${venue.slug}/reserve`}
-            className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted hover:text-cream hover:border-line/60 transition-all shrink-0"
+            className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-medium text-base shadow-lg transition-transform active:scale-95 shrink-0"
+            style={{ background: venue.accentColor }}
           >
-            <CalendarDays className="h-3 w-3" />
-            <span className="hidden sm:inline">Бронювати</span>
+            <CalendarDays className="h-3.5 w-3.5" />
+            <span>Бронювати</span>
           </Link>
 
           <div
