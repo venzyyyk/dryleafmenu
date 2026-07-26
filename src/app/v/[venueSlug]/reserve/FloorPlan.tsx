@@ -14,18 +14,23 @@ interface Props {
   tables: ReserveTable[];
   selectedId: string | null;
   accentColor: string;
+  venueSlug: string;
   onSelect: (table: ReserveTable) => void;
 }
 
-// ─── Схема зала Dry Leaf ────────────────────────────────────
-// Ключ = kind-number, позиции в viewBox 760x460.
 type Spot = { x: number; y: number; w: number; h: number };
-const LAYOUT: Record<string, Spot> = {
-  // Малый бильярд — верхний левый угол
+
+const GOLD = "#C9A86A";
+const SAGE = "#8DA888";
+const FELT = "#3E5C46";
+const FELT_LIGHT = "#4A6B52";
+const WALL = "#3A3F32";
+const DECOR = "#5A6050";
+
+// ═══════════════ DRY LEAF (760×460, вход снизу) ═══════════════
+const DRYLEAF_SPOTS: Record<string, Spot> = {
   "BILLIARD_SMALL-1": { x: 70, y: 52, w: 50, h: 74 },
   "BILLIARD_SMALL-2": { x: 148, y: 52, w: 50, h: 74 },
-
-  // Большой бильярд — слева и справа, симметрично
   "BILLIARD_LARGE-1": { x: 52, y: 178, w: 124, h: 64 },
   "BILLIARD_LARGE-2": { x: 58, y: 288, w: 56, h: 104 },
   "BILLIARD_LARGE-3": { x: 140, y: 288, w: 56, h: 104 },
@@ -33,12 +38,8 @@ const LAYOUT: Record<string, Spot> = {
   "BILLIARD_LARGE-5": { x: 584, y: 160, w: 124, h: 64 },
   "BILLIARD_LARGE-6": { x: 566, y: 288, w: 56, h: 104 },
   "BILLIARD_LARGE-7": { x: 648, y: 288, w: 56, h: 104 },
-
-  // Столы на 4 места — центр
   "DINING-1": { x: 350, y: 172, w: 58, h: 78 },
   "DINING-2": { x: 350, y: 284, w: 58, h: 78 },
-
-  // Столы на 2 места — вдоль стен
   "DINING-3": { x: 212, y: 24, w: 36, h: 36 },
   "DINING-4": { x: 514, y: 24, w: 36, h: 36 },
   "DINING-5": { x: 22, y: 120, w: 36, h: 36 },
@@ -49,34 +50,121 @@ const LAYOUT: Record<string, Spot> = {
   "DINING-10": { x: 514, y: 404, w: 36, h: 36 },
 };
 
-const GOLD = "#C9A86A";
-const SAGE = "#8DA888";
-const FELT = "#3E5C46";
-const FELT_LIGHT = "#4A6B52";
+function DryleafFixtures() {
+  return (
+    <>
+      {/* Окна (верхняя стена) */}
+      <line x1="120" y1="8" x2="185" y2="8" stroke={DECOR} strokeWidth="7" strokeLinecap="round" />
+      <line x1="575" y1="8" x2="640" y2="8" stroke={DECOR} strokeWidth="7" strokeLinecap="round" />
 
-export function FloorPlan({ tables, selectedId, accentColor, onSelect }: Props) {
+      {/* Бар */}
+      <g filter="url(#softShadow)">
+        <rect x="252" y="20" width="256" height="64" rx="10" fill="#232619" stroke={SAGE} strokeWidth="1.5" />
+        <rect x="252" y="72" width="256" height="12" rx="6" fill={SAGE} opacity="0.25" />
+        <text x="380" y="55" textAnchor="middle" fill={SAGE} fontSize="16" letterSpacing="6" fontWeight="500">
+          БАР
+        </text>
+      </g>
+      {[288, 334, 380, 426, 472].map((cx) => (
+        <circle key={cx} cx={cx} cy={100} r="6" fill="none" stroke={DECOR} strokeWidth="1.5" />
+      ))}
+
+      {/* Вход снизу */}
+      <path d="M 342 450 A 38 38 0 0 1 380 412" fill="none" stroke={DECOR} strokeWidth="1.5" strokeDasharray="3 4" />
+      <rect x="342" y="446" width="76" height="9" rx="3" fill="#0E0F0C" stroke={DECOR} strokeWidth="1" />
+      <text x="380" y="436" textAnchor="middle" fill="#9A9B90" fontSize="10" letterSpacing="3">
+        ВХІД
+      </text>
+    </>
+  );
+}
+
+// ═══════════════ CITADEL (560×640, вход сверху, бар снизу) ═══════════════
+const CITADEL_SPOTS: Record<string, Spot> = {
+  "BILLIARD_LARGE-8": { x: 66, y: 58, w: 66, h: 120 },
+  "BILLIARD_LARGE-1": { x: 428, y: 58, w: 66, h: 120 },
+  "BILLIARD_LARGE-7": { x: 58, y: 238, w: 130, h: 68 },
+  "BILLIARD_LARGE-2": { x: 372, y: 238, w: 130, h: 68 },
+  "BILLIARD_LARGE-6": { x: 58, y: 348, w: 130, h: 68 },
+  "BILLIARD_LARGE-3": { x: 372, y: 348, w: 130, h: 68 },
+  "BILLIARD_LARGE-5": { x: 66, y: 458, w: 66, h: 120 },
+  "BILLIARD_LARGE-4": { x: 428, y: 458, w: 66, h: 120 },
+};
+
+function CitadelFixtures() {
+  return (
+    <>
+      {/* Вход сверху */}
+      <rect x="242" y="6" width="76" height="9" rx="3" fill="#0E0F0C" stroke={DECOR} strokeWidth="1" />
+      <path d="M 242 12 A 38 38 0 0 0 280 50" fill="none" stroke={DECOR} strokeWidth="1.5" strokeDasharray="3 4" />
+      <text x="280" y="34" textAnchor="middle" fill="#9A9B90" fontSize="10" letterSpacing="3">
+        ВХІД
+      </text>
+
+      {/* Бар внизу по центру */}
+      <g filter="url(#softShadow)">
+        <rect x="206" y="478" width="148" height="104" rx="10" fill="#232619" stroke={SAGE} strokeWidth="1.5" />
+        <rect x="206" y="478" width="148" height="12" rx="6" fill={SAGE} opacity="0.25" />
+        <text x="280" y="536" textAnchor="middle" fill={SAGE} fontSize="15" letterSpacing="5" fontWeight="500">
+          БАР
+        </text>
+      </g>
+      {[228, 262, 296, 330].map((cx) => (
+        <circle key={cx} cx={cx} cy={464} r="6" fill="none" stroke={DECOR} strokeWidth="1.5" />
+      ))}
+
+      {/* Диванчики вдоль стен (декор) */}
+      {[100, 180, 300, 380, 500].map((y) => (
+        <rect key={`l${y}`} x="20" y={y} width="13" height="30" rx="5" fill="none" stroke={DECOR} strokeWidth="1.3" />
+      ))}
+      {[100, 180, 300, 380, 500].map((y) => (
+        <rect key={`r${y}`} x="527" y={y} width="13" height="30" rx="5" fill="none" stroke={DECOR} strokeWidth="1.3" />
+      ))}
+    </>
+  );
+}
+
+// ═══════════════ Конфиг залов ═══════════════
+const PLANS: Record<string, { vbW: number; vbH: number; spots: Record<string, Spot>; Fixtures: () => JSX.Element }> = {
+  "dry-leaf": { vbW: 760, vbH: 460, spots: DRYLEAF_SPOTS, Fixtures: DryleafFixtures },
+  "citadel": { vbW: 560, vbH: 640, spots: CITADEL_SPOTS, Fixtures: CitadelFixtures },
+};
+
+export function FloorPlan({ tables, selectedId, accentColor, venueSlug, onSelect }: Props) {
+  const plan = PLANS[venueSlug];
+
+  if (!plan) {
+    return (
+      <TableChips tables={tables} selectedId={selectedId} accentColor={accentColor} venueSlug={venueSlug} onSelect={onSelect} />
+    );
+  }
+
   const placed: { table: ReserveTable; spot: Spot }[] = [];
-  const unplaced: ReserveTable[] = [];
-
   tables.forEach((t) => {
-    const spot = LAYOUT[`${t.kind}-${t.number}`];
+    const spot = plan.spots[`${t.kind}-${t.number}`];
     if (spot) placed.push({ table: t, spot });
-    else unplaced.push(t);
   });
 
   if (placed.length === 0) {
     return (
-      <TableChips tables={tables} selectedId={selectedId} accentColor={accentColor} onSelect={onSelect} />
+      <TableChips tables={tables} selectedId={selectedId} accentColor={accentColor} venueSlug={venueSlug} onSelect={onSelect} />
     );
   }
+
+  const { vbW, vbH, Fixtures } = plan;
+  const kindsPresent = new Set(placed.map((p) => p.table.kind));
 
   return (
     <div className="space-y-3">
       <div className="rounded-2xl bg-surface border border-line p-3 sm:p-4">
-        <svg viewBox="0 0 760 460" className="w-full h-auto select-none">
+        <svg
+          viewBox={`0 0 ${vbW} ${vbH}`}
+          className="mx-auto h-auto w-full select-none"
+          style={vbH > vbW ? { maxWidth: 440 } : undefined}
+        >
           <defs>
             <radialGradient id="hallGlow" cx="50%" cy="18%" r="80%">
-              <stop offset="0%" stopColor="#8DA888" stopOpacity="0.07" />
+              <stop offset="0%" stopColor={SAGE} stopOpacity="0.07" />
               <stop offset="100%" stopColor="transparent" />
             </radialGradient>
             <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
@@ -84,36 +172,12 @@ export function FloorPlan({ tables, selectedId, accentColor, onSelect }: Props) 
             </filter>
           </defs>
 
-          {/* Пол */}
-          <rect x="10" y="10" width="740" height="440" rx="16" fill="#15170F" />
-          <rect x="10" y="10" width="740" height="440" rx="16" fill="url(#hallGlow)" />
+          {/* Пол и стены */}
+          <rect x="10" y="10" width={vbW - 20} height={vbH - 20} rx="16" fill="#15170F" />
+          <rect x="10" y="10" width={vbW - 20} height={vbH - 20} rx="16" fill="url(#hallGlow)" />
+          <rect x="10" y="10" width={vbW - 20} height={vbH - 20} rx="16" fill="none" stroke={WALL} strokeWidth="5" />
 
-          {/* Стены */}
-          <rect x="10" y="10" width="740" height="440" rx="16" fill="none" stroke="#3A3F32" strokeWidth="5" />
-
-          {/* Окна (верхняя стена) */}
-          <line x1="120" y1="8" x2="185" y2="8" stroke="#5A6050" strokeWidth="7" strokeLinecap="round" />
-          <line x1="575" y1="8" x2="640" y2="8" stroke="#5A6050" strokeWidth="7" strokeLinecap="round" />
-
-          {/* Бар */}
-          <g filter="url(#softShadow)">
-            <rect x="252" y="20" width="256" height="64" rx="10" fill="#232619" stroke={SAGE} strokeWidth="1.5" />
-            <rect x="252" y="72" width="256" height="12" rx="6" fill={SAGE} opacity="0.25" />
-            <text x="380" y="55" textAnchor="middle" fill={SAGE} fontSize="16" letterSpacing="6" fontWeight="500">
-              БАР
-            </text>
-          </g>
-          {/* Барные стулья */}
-          {[288, 334, 380, 426, 472].map((cx) => (
-            <circle key={cx} cx={cx} cy={100} r="6" fill="none" stroke="#5A6050" strokeWidth="1.5" />
-          ))}
-
-          {/* Вход */}
-          <path d="M 342 450 A 38 38 0 0 1 380 412" fill="none" stroke="#5A6050" strokeWidth="1.5" strokeDasharray="3 4" />
-          <rect x="342" y="446" width="76" height="9" rx="3" fill="#0E0F0C" stroke="#5A6050" strokeWidth="1" />
-          <text x="380" y="436" textAnchor="middle" fill="#9A9B90" fontSize="10" letterSpacing="3">
-            ВХІД
-          </text>
+          <Fixtures />
 
           {/* Столы */}
           {placed.map(({ table, spot }) => (
@@ -129,14 +193,12 @@ export function FloorPlan({ tables, selectedId, accentColor, onSelect }: Props) 
         </svg>
       </div>
 
-      {/* Легенда */}
+      {/* Легенда — только то, что реально есть в зале */}
       <div className="flex flex-wrap gap-x-4 gap-y-1.5 px-1">
-        <Legend color={GOLD} label="Великі більярдні столи" />
-        <Legend color={SAGE} label="Малі більярдні столи" />
-        <Legend color="#5A6050" label="Звичайні столи" />
+        {kindsPresent.has("BILLIARD_LARGE") && <Legend color={GOLD} label="Великі більярдні столи" />}
+        {kindsPresent.has("BILLIARD_SMALL") && <Legend color={SAGE} label="Малі більярдні столи" />}
+        {kindsPresent.has("DINING") && <Legend color={DECOR} label="Звичайні столи" />}
       </div>
-
-      {/* Столы вне схемы не показываем — на схеме есть всё, что можно бронировать */}
     </div>
   );
 }
@@ -155,7 +217,7 @@ function TableShape({
   const cx = x + w / 2;
   const cy = y + h / 2;
   const isBilliard = table.kind !== "DINING";
-  const rim = table.kind === "BILLIARD_LARGE" ? GOLD : table.kind === "BILLIARD_SMALL" ? SAGE : "#5A6050";
+  const rim = table.kind === "BILLIARD_LARGE" ? GOLD : table.kind === "BILLIARD_SMALL" ? SAGE : DECOR;
 
   return (
     <motion.g
@@ -200,7 +262,7 @@ function TableShape({
             ? [[cx, y - 7], [cx, y + h + 7], [x - 7, cy], [x + w + 7, cy]]
             : [[x - 7, cy], [x + w + 7, cy]]
           ).map(([px, py], i) => (
-            <circle key={i} cx={px} cy={py} r="5.5" fill="#1C1F15" stroke="#5A6050" strokeWidth="1.3" />
+            <circle key={i} cx={px} cy={py} r="5.5" fill="#1C1F15" stroke={DECOR} strokeWidth="1.3" />
           ))}
           {/* Столешница */}
           <rect

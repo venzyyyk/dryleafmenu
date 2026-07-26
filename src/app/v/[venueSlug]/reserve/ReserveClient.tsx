@@ -182,6 +182,7 @@ export function ReserveClient({ venueId, venueSlug, venueName, accentColor, tabl
             tables={tables}
             selectedId={table?.id ?? null}
             accentColor={accentColor}
+            venueSlug={venueSlug}
             onSelect={setTable}
           />
           {table && (
