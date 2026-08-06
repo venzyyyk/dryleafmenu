@@ -17,9 +17,9 @@ export default function TableQRClient({ tableCode, tableNumber, venueSlug, venue
 
   useEffect(() => {
     setTable(tableCode);
-    // Небольшая пауза для красивого перехода
+    // Ведём на главную: там меню закладів, товари та послуги — видно все сразу
     const timer = setTimeout(() => {
-      router.replace(`/v/${venueSlug}?table=${tableCode}`);
+      router.replace(`/?table=${tableCode}`);
     }, 1600);
     return () => clearTimeout(timer);
   }, [tableCode, venueSlug, router, setTable]);

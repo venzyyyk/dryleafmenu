@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { ShoppingBag, GraduationCap } from "lucide-react";
 import { DishImage } from "./DishImage";
 
 type Venue = {
@@ -16,6 +17,7 @@ type Venue = {
 
 interface Props {
   venues: Venue[];
+  tableCode?: string | null;
 }
 
 const container = {
@@ -27,7 +29,8 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-export function HeroSection({ venues }: Props) {
+export function HeroSection({ venues, tableCode }: Props) {
+  const q = tableCode ? `?table=${tableCode}` : "";
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-base">
       {/* Фоновий градієнт (радіальний вгорі) */}
@@ -53,8 +56,32 @@ export function HeroSection({ venues }: Props) {
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="mb-5 text-[9px] uppercase tracking-[0.45em] text-sage">Меню закладу</p>
-          <LogoCycle />
+
+          {/* Лого по центру, товари/послуги по боках */}
+          <div className="flex items-center justify-center gap-3 sm:gap-6">
+            <SideLink
+              href={`/shop${q}`}
+              label="Товари"
+              hint="Киї, наклейки, крейда"
+              icon={<ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />}
+              color="#C9A86A"
+            />
+            <LogoCycle />
+            <SideLink
+              href={`/services${q}`}
+              label="Послуги"
+              hint="Навчання, сертифікати"
+              icon={<GraduationCap className="h-4 w-4 sm:h-5 sm:w-5" />}
+              color="#A8B89A"
+            />
+          </div>
+
           <div className="mx-auto mt-[18px] h-px w-20 bg-gradient-to-r from-transparent via-sage to-transparent" />
+          {tableCode && (
+            <p className="mt-3 text-xs" style={{ color: "#A8B89A" }}>
+              🪑 Ви за столиком #{tableCode.slice(0, 4).toUpperCase()}
+            </p>
+          )}
           <p className="mt-[18px] text-xs tracking-wide text-muted">
             Оберіть локацію, щоб переглянути меню
           </p>
@@ -69,7 +96,7 @@ export function HeroSection({ venues }: Props) {
         >
           {venues.map((venue) => (
             <motion.div key={venue.slug} variants={item}>
-              <VenueCard venue={venue} />
+              <VenueCard venue={venue} query={q} />
             </motion.div>
           ))}
         </motion.div>
@@ -105,7 +132,7 @@ function LogoCycle() {
   }, []);
 
   return (
-    <div className="relative mx-auto flex h-[130px] w-[min(78vw,420px)] items-center justify-center sm:h-[160px]">
+    <div className="relative flex h-[110px] w-[min(42vw,260px)] shrink-0 items-center justify-center sm:h-[150px] sm:w-[min(38vw,320px)]">
       <AnimatePresence mode="wait">
         <motion.div
           key={idx}
@@ -129,9 +156,39 @@ function LogoCycle() {
   );
 }
 
-function VenueCard({ venue }: { venue: Venue }) {
+// ─── Боковые ссылки: товары и услуги ───────────────────────
+function SideLink({
+  href, label, hint, icon, color,
+}: {
+  href: string; label: string; hint: string; icon: React.ReactNode; color: string;
+}) {
   return (
-    <Link href={`/v/${venue.slug}`} className="group block outline-none">
+    <Link href={href} className="group block shrink-0 outline-none">
+      <motion.div
+        whileHover={{ y: -4 }}
+        whileTap={{ scale: 0.96 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="flex w-[86px] flex-col items-center gap-2 rounded-2xl border border-line bg-surface/70 px-2 py-4 backdrop-blur-sm transition-colors sm:w-[124px] sm:px-3 sm:py-5"
+        style={{ borderColor: color + "33" }}
+      >
+        <span
+          className="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11"
+          style={{ background: color + "1A", color }}
+        >
+          {icon}
+        </span>
+        <span className="font-serif text-sm font-light text-cream sm:text-base">{label}</span>
+        <span className="text-[8px] leading-tight tracking-wide text-muted/70 sm:text-[9px]">
+          {hint}
+        </span>
+      </motion.div>
+    </Link>
+  );
+}
+
+function VenueCard({ venue, query = "" }: { venue: Venue; query?: string }) {
+  return (
+    <Link href={`/v/${venue.slug}${query}`} className="group block outline-none">
       <motion.div
         whileHover={{ y: -5 }}
         whileTap={{ scale: 0.97 }}

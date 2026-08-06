@@ -5,7 +5,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, ShoppingBag, CalendarDays,
-  UtensilsCrossed, Building2, LogOut, Bell,
+  UtensilsCrossed, Building2, LogOut, Bell, Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getNewSince } from "@/server/admin";
@@ -15,6 +15,7 @@ const NAV = [
   { href: "/admin/orders", label: "Замовлення", icon: ShoppingBag },
   { href: "/admin/reservations", label: "Бронювання", icon: CalendarDays },
   { href: "/admin/menu", label: "Меню", icon: UtensilsCrossed },
+  { href: "/admin/catalog", label: "Каталог", icon: Tag },
   { href: "/admin/venues", label: "Заклади", icon: Building2 },
 ];
 

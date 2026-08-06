@@ -192,6 +192,37 @@ model Reservation {
   @@index([date])
 }
 
+// ─── Каталог: товари та послуги ───────────────────────────
+enum CatalogKind {
+  PRODUCT
+  SERVICE
+}
+
+model CatalogCategory {
+  id        String        @id @default(cuid())
+  kind      CatalogKind
+  name      String
+  note      String? // підзаголовок/умови під назвою розділу
+  sortOrder Int           @default(0)
+  items     CatalogItem[]
+
+  @@index([kind])
+}
+
+model CatalogItem {
+  id          String          @id @default(cuid())
+  categoryId  String
+  category    CatalogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       String? // вільний текст: "1250 грн", "1100 USD", "900 грн/год"
+  badge       String? // напр. "тимчасово недоступно"
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+
+  @@index([categoryId])
+}
+
 model AdminUser {
   id           String   @id @default(cuid())
   email        String   @unique
